@@ -1,0 +1,12 @@
+quarkus.datasource.jdbc.url=jdbc:postgresql://localhost:5432/...
+quarkus.datasource.username=...
+quarkus.datasource.password=...
+quarkus.datasource.db-kind=postgresql
+quarkus.datasource.jdbc.max-size=16
+
+
+quarkus.hibernate-orm.log.sql=true
+quarkus.hibernate-orm.database.generation=none
+quarkus.hibernate-orm.globally_quoted_identifiers=true
+quarkus.hibernate-orm.database.globally-quoted-identifiers=true
+hibernate.globally_quoted_identifiers=true
