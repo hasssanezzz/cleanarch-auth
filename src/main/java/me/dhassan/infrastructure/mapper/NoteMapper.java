@@ -1,30 +1,43 @@
 package me.dhassan.infrastructure.mapper;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import me.dhassan.domain.entity.Note;
+import me.dhassan.domain.entity.User;
 import me.dhassan.infrastructure.entity.NoteEntity;
 import me.dhassan.infrastructure.entity.UserEntity;
+import me.dhassan.infrastructure.repository.UserRepositoryImpl;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@ApplicationScoped
 public class NoteMapper {
-    public static Note mapToNoteModel(NoteEntity noteEntity) {
-        Note note = new Note(noteEntity.title, noteEntity.content);
-        note.id = noteEntity.id;
 
-        return note;
+    @Inject
+    UserRepositoryImpl userRepository;
+
+    @Inject
+    UserMapper userMapper;
+
+
+    public Note mapToNoteModel(NoteEntity noteEntity) {
+        return new Note(noteEntity.id, noteEntity.userEntity.id, noteEntity.title, noteEntity.content);
     }
 
-    public static NoteEntity mapToNoteEntity(Note note, UserEntity userEntity) {
-        NoteEntity noteEntity = new NoteEntity(note.title, note.content, userEntity);
-        noteEntity.id = note.id;
+    public NoteEntity mapToNoteEntity(Note note) {
+        User user = userRepository.findById(note.userId);
+        NoteEntity noteEntity = new NoteEntity(note.title, note.content, userMapper.mapToUserEntity(user));
+
+        if (note.id != null)
+            noteEntity.id = note.id;
 
         return noteEntity;
     }
 
-    public static List<Note> mapNoteEntitiesToNoteModels(List<NoteEntity> noteEntities) {
+    public List<Note> mapNoteEntitiesToNoteModels(List<NoteEntity> noteEntities) {
         return noteEntities.stream()
-                .map(NoteMapper::mapToNoteModel)
+                .map(this::mapToNoteModel)
                 .collect(Collectors.toList());
     }
 }

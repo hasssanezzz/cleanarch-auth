@@ -1,14 +1,20 @@
 package me.dhassan.api.resources;
 
 import jakarta.inject.Inject;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import me.dhassan.api.contexts.SecurityContext;
 import me.dhassan.api.interceptors.Authenticated;
+import me.dhassan.api.responseObjects.ErrorResponse;
 import me.dhassan.domain.entity.User;
+import me.dhassan.infrastructure.entity.UserEntity;
+import me.dhassan.infrastructure.mapper.UserMapper;
 import me.dhassan.infrastructure.service.UserServiceImpl;
 
+import java.util.Set;
 import java.util.UUID;
 
 import static me.dhassan.infrastructure.utils.Utilities.*;
@@ -21,6 +27,12 @@ public class UserResource {
 
     @Inject
     SecurityContext securityContext;
+
+    @Inject
+    UserMapper userMapper;
+
+    @Inject
+    Validator validator;
 
     @GET
     @Path("/validate")
@@ -41,17 +53,32 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response register(User user) {
 
-        // TODO handle validation
+        // TODO fix the validator.validate(obj) problem
+        // handle validation
+        Set<ConstraintViolation<UserEntity>> violations = validator.validate(userMapper.mapToUserEntity(user));
+        ErrorResponse errors = new ErrorResponse();
+        if (!violations.isEmpty()) {
+            for (ConstraintViolation<UserEntity> violation : violations) {
+                errors.addError(violation.getPropertyPath().toString(), violation.getMessage());
+            }
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(errors)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
+
 
         User userWithSameEmail = userServiceImpl.findUserByEmail(user.email);
 
-        if(userWithSameEmail != null)
-            return Response.status(Response.Status.BAD_REQUEST).entity("Email is already in use").build();
+        if(userWithSameEmail != null) {
+            errors.addError("email", "Email is already in use");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
+        }
 
 
         // hash the password
         user.password = hashPassword(user.password);
-
         // save the new user
         User newUser = userServiceImpl.createUser(user);
 
@@ -64,16 +91,35 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response login(User user) {
 
-        // TODO add validation
+        // TODO fix the validator.validate(obj) problem
+        // handle validation
+        Set<ConstraintViolation<UserEntity>> violations = validator.validate(userMapper.mapToUserEntity(user));
+        ErrorResponse errors = new ErrorResponse();
+        if (!violations.isEmpty()) {
+            for (ConstraintViolation<UserEntity> violation : violations) {
+                errors.addError(violation.getPropertyPath().toString(), violation.getMessage());
+            }
+            return Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity(errors)
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
 
         User userWithSameEmail = userServiceImpl.findUserByEmail(user.email);
 
-        if(userWithSameEmail == null)
-            return Response.status(Response.Status.BAD_REQUEST).entity("Email not found").build();
+        if(userWithSameEmail == null) {
+            errors.addError("email", "Email not found");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
+        }
+
 
         // validate the password
-        if (!compareHashedPassword(user.password, userWithSameEmail.password))
-            return Response.status(Response.Status.BAD_REQUEST).entity("Wrong email/password combination").build();
+        if (!compareHashedPassword(user.password, userWithSameEmail.password)) {
+            errors.addError("password", "Invalid email/password combination");
+            return Response.status(Response.Status.BAD_REQUEST).entity(errors).build();
+        }
+
 
         String token = createToken(userWithSameEmail.id.toString());
         return Response.ok()

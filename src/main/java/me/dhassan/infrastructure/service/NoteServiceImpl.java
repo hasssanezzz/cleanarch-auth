@@ -2,78 +2,49 @@ package me.dhassan.infrastructure.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import me.dhassan.domain.entity.Note;
+import me.dhassan.domain.entity.User;
 import me.dhassan.domain.service.NoteService;
-import me.dhassan.infrastructure.entity.NoteEntity;
-import me.dhassan.infrastructure.entity.UserEntity;
-import me.dhassan.infrastructure.mapper.NoteMapper;
+import me.dhassan.infrastructure.repository.NoteRepositoryImpl;
+import me.dhassan.infrastructure.repository.UserRepositoryImpl;
 
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class NoteServiceImpl implements NoteService {
     @Inject
-    EntityManager entityManager;
+    NoteRepositoryImpl noteRepository;
+
+    @Inject
+    UserRepositoryImpl userRepository;
 
     @Transactional
-    public <IDType> Note createNote(Note note, IDType userId) {
-        UserEntity user = entityManager.find(UserEntity.class, userId);
-
-        if (user == null) return null;
-
-        NoteEntity noteEntity = NoteMapper.mapToNoteEntity(note, user);
-        entityManager.persist(noteEntity);
-
-        return NoteMapper.mapToNoteModel(noteEntity);
+    public Note createNote(Note note) {
+        noteRepository.save(note);
+        return note;
     }
 
-    @Transactional
     public <IDType> List<Note> getUserNotes(IDType userId) {
-        // TODO remove user password
-        String jpql = "SELECT n FROM note n WHERE n.userEntity.id = :userId";
-        TypedQuery<NoteEntity> query = entityManager.createQuery(jpql, NoteEntity.class);
-        query.setParameter("userId", userId);
-
-        return NoteMapper.mapNoteEntitiesToNoteModels(
-                query.getResultList()
-        );
+        User user = userRepository.findById(userId);
+        return noteRepository.findAll(user);
     }
 
-    @Transactional
     public <IDType> Note getNoteById(IDType id) {
-        return NoteMapper.mapToNoteModel(entityManager.find(NoteEntity.class, id));
+        return noteRepository.findById(id);
     }
-
-
 
     @Transactional
     public <IDType> Note updateNoteById(IDType id, Note note) {
-        NoteEntity noteEntity = entityManager.find(NoteEntity.class, id);
-
-        if (noteEntity == null)
-            return null;
-
-        noteEntity.title = note.title == null ? noteEntity.title : note.title;
-        noteEntity.content = note.content == null ? noteEntity.content : note.content;
-
-        entityManager.merge(noteEntity);
-
-        return NoteMapper.mapToNoteModel(noteEntity);
+        note.id = UUID.fromString(id.toString());
+        noteRepository.update(note);
+        return note;
     }
 
 
     @Transactional
-    public <IDType> boolean deleteNoteById(IDType id) {
-        NoteEntity noteEntity = entityManager.find(NoteEntity.class, id);
-
-        if (noteEntity == null)
-            return false;
-
-        entityManager.remove(noteEntity);
-
-        return true;
+    public <IDType> void deleteNoteById(IDType id) {
+        noteRepository.delete(id);
     }
 }

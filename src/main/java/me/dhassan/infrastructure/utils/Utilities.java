@@ -7,7 +7,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class Utilities {
 
-    private static final String JWT_SECRET = "123"; // TODO add env variable
+    private static final String JWT_SECRET = "123"; // TODO read env variable
 
     public static String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
