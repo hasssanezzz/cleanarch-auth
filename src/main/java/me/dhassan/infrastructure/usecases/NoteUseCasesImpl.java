@@ -1,11 +1,11 @@
-package me.dhassan.infrastructure.service;
+package me.dhassan.infrastructure.usecases;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import me.dhassan.domain.entity.Note;
 import me.dhassan.domain.entity.User;
-import me.dhassan.domain.service.NoteService;
+import me.dhassan.domain.service.NoteUseCases;
 import me.dhassan.infrastructure.repository.NoteRepositoryImpl;
 import me.dhassan.infrastructure.repository.UserRepositoryImpl;
 
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
-public class NoteServiceImpl implements NoteService {
+public class NoteUseCasesImpl implements NoteUseCases {
     @Inject
     NoteRepositoryImpl noteRepository;
 

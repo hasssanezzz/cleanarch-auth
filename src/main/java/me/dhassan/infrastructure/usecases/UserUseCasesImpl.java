@@ -1,14 +1,14 @@
-package me.dhassan.infrastructure.service;
+package me.dhassan.infrastructure.usecases;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import me.dhassan.domain.entity.User;
-import me.dhassan.domain.service.UserService;
+import me.dhassan.domain.service.UserUseCases;
 import me.dhassan.infrastructure.repository.UserRepositoryImpl;
 
 @ApplicationScoped
-public class UserServiceImpl implements UserService {
+public class UserUseCasesImpl implements UserUseCases {
 
     @Inject
     UserRepositoryImpl userRepository;

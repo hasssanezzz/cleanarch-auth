@@ -12,7 +12,7 @@ import me.dhassan.api.responseObjects.ErrorResponse;
 import me.dhassan.domain.entity.User;
 import me.dhassan.infrastructure.entity.UserEntity;
 import me.dhassan.infrastructure.mapper.UserMapper;
-import me.dhassan.infrastructure.service.UserServiceImpl;
+import me.dhassan.infrastructure.usecases.UserUseCasesImpl;
 
 import java.util.Set;
 import java.util.UUID;
@@ -23,7 +23,7 @@ import static me.dhassan.infrastructure.utils.Utilities.*;
 public class UserResource {
 
     @Inject
-    UserServiceImpl userServiceImpl;
+    UserUseCasesImpl userUseCases;
 
     @Inject
     SecurityContext securityContext;
@@ -41,7 +41,7 @@ public class UserResource {
     public Response validate() {
         UUID userId = securityContext.userId;
 
-        User user = userServiceImpl.findUserById(userId);
+        User user = userUseCases.findUserById(userId);
         user.password = null;
 
         return Response.ok().entity(user).build();
@@ -69,7 +69,7 @@ public class UserResource {
         }
 
 
-        User userWithSameEmail = userServiceImpl.findUserByEmail(user.email);
+        User userWithSameEmail = userUseCases.findUserByEmail(user.email);
 
         if(userWithSameEmail != null) {
             errors.addError("email", "Email is already in use");
@@ -80,7 +80,7 @@ public class UserResource {
         // hash the password
         user.password = hashPassword(user.password);
         // save the new user
-        User newUser = userServiceImpl.createUser(user);
+        User newUser = userUseCases.createUser(user);
 
         return Response.ok().entity(newUser).build();
     }
@@ -106,7 +106,7 @@ public class UserResource {
                     .build();
         }
 
-        User userWithSameEmail = userServiceImpl.findUserByEmail(user.email);
+        User userWithSameEmail = userUseCases.findUserByEmail(user.email);
 
         if(userWithSameEmail == null) {
             errors.addError("email", "Email not found");

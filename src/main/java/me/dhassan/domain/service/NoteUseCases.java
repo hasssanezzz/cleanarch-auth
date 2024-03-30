@@ -4,7 +4,7 @@ import me.dhassan.domain.entity.Note;
 
 import java.util.List;
 
-public interface NoteService {
+public interface NoteUseCases {
 
     <IDType> Note createNote(Note note);
 

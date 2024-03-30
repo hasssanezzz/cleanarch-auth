@@ -11,9 +11,8 @@ import jakarta.ws.rs.core.Response;
 import me.dhassan.api.responseObjects.ErrorResponse;
 import me.dhassan.domain.entity.Note;
 import me.dhassan.infrastructure.entity.NoteEntity;
-import me.dhassan.infrastructure.entity.UserEntity;
 import me.dhassan.infrastructure.mapper.NoteMapper;
-import me.dhassan.infrastructure.service.NoteServiceImpl;
+import me.dhassan.infrastructure.usecases.NoteUseCasesImpl;
 import me.dhassan.api.contexts.SecurityContext;
 import me.dhassan.api.interceptors.Authenticated;
 
@@ -28,7 +27,7 @@ public class NoteResource {
     SecurityContext securityContext;
 
     @Inject
-    NoteServiceImpl noteService;
+    NoteUseCasesImpl noteService;
 
     @Inject
     NoteMapper noteMapper;
