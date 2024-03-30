@@ -4,7 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import me.dhassan.domain.entity.User;
-import me.dhassan.domain.service.UserUseCases;
+import me.dhassan.domain.usecases.UserUseCases;
 import me.dhassan.infrastructure.repository.UserRepositoryImpl;
 
 @ApplicationScoped

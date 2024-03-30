@@ -1,4 +1,4 @@
-package me.dhassan.domain.service;
+package me.dhassan.domain.usecases;
 
 import me.dhassan.domain.entity.Note;
 

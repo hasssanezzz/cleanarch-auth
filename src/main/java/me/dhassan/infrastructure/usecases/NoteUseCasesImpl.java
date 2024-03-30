@@ -5,7 +5,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import me.dhassan.domain.entity.Note;
 import me.dhassan.domain.entity.User;
-import me.dhassan.domain.service.NoteUseCases;
+import me.dhassan.domain.usecases.NoteUseCases;
 import me.dhassan.infrastructure.repository.NoteRepositoryImpl;
 import me.dhassan.infrastructure.repository.UserRepositoryImpl;
 
